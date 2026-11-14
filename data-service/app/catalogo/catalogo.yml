@@ -1,0 +1,149 @@
+# catalogo.yml — Catálogo curado de variáveis (fonte única de verdade)
+#
+# Quem usa:
+#   - Agente de intenção: só pode escolher `id`s daqui (usar `nome`, `definicao`, `palavras_chave`).
+#   - Tool obter_serie_temporal: usa `produtos`, `variavel_tecnica`, `conector`, `conversao`.
+#   - GET /internal/variaveis -> GET /api/variaveis: expõe id, nome, definicao, unidade, resolucoes, periodo.
+#
+# ATENÇÃO: nenhum produto foi validado contra o CMR (validado: false).
+# Antes de confiar neles, corre: python scripts/validar_catalogo.py
+# e altera `validado` para true só depois de uma série real ter sido obtida.
+#
+# Convenções:
+#   conector: data_rods | opendap | appeears
+#   conversao.tipo: nenhuma | kelvin_para_celsius | mm_h_para_mm_mes | fluxo_para_mm_dia | escala
+#   resolucoes: chaves "mensal" / "diaria"; só existe a chave se houver produto para ela.
+
+versao_catalogo: 1
+
+variaveis:
+
+  - id: precipitacao
+    nome: Precipitação
+    definicao: Quantidade de chuva que cai numa região, medida por satélites (GPM IMERG).
+    categoria: atmosfera
+    palavras_chave: [chuva, precipitação, pluviosidade, rain, rainfall, precipitation]
+    conector: opendap
+    variavel_tecnica: precipitation
+    unidade_original: mm/h
+    unidade_exibicao: mm/mês
+    conversao: { tipo: mm_h_para_mm_mes }   # valor_mm_h * 24 * dias_do_mes
+    resolucao_espacial_graus: 0.1
+    produtos:
+      mensal: { short_name: GPM_3IMERGM, versao: "07" }
+      diaria: { short_name: GPM_3IMERGDF, versao: "07" }   # fora do MVP
+    periodo_esperado: { inicio: "2000-06", fim: null }
+    validado: false
+
+  - id: temperatura_2m
+    nome: Temperatura do ar a 2 m
+    definicao: Temperatura do ar a 2 metros da superfície (reanálise MERRA-2).
+    categoria: atmosfera
+    palavras_chave: [temperatura, calor, aquecimento, clima, temperature, warming, T2M]
+    conector: opendap
+    variavel_tecnica: T2M
+    unidade_original: K
+    unidade_exibicao: "°C"
+    conversao: { tipo: kelvin_para_celsius }
+    resolucao_espacial_graus: 0.5   # 0.5° lat x 0.625° lon
+    produtos:
+      mensal: { short_name: M2TMNXSLV, versao: "5.12.4" }
+    periodo_esperado: { inicio: "1980-01", fim: null }
+    validado: false
+
+  - id: temperatura_superficie
+    nome: Temperatura da superfície (skin temperature)
+    definicao: Temperatura da própria superfície (solo, água ou vegetação), diferente da temperatura do ar.
+    categoria: superficie
+    palavras_chave: [temperatura da superfície, solo quente, skin temperature, TS, ilha de calor]
+    conector: opendap
+    variavel_tecnica: TS
+    unidade_original: K
+    unidade_exibicao: "°C"
+    conversao: { tipo: kelvin_para_celsius }
+    resolucao_espacial_graus: 0.5
+    produtos:
+      mensal: { short_name: M2TMNXSLV, versao: "5.12.4" }
+    periodo_esperado: { inicio: "1980-01", fim: null }
+    validado: false
+
+  - id: umidade_solo
+    nome: Umidade do solo (0–10 cm)
+    definicao: Água contida na camada superficial do solo (modelo GLDAS Noah).
+    categoria: terra
+    palavras_chave: [umidade, humidade do solo, seca, drought, soil moisture, solo]
+    conector: data_rods
+    variavel_tecnica: SoilMoi0_10cm_inst
+    unidade_original: kg/m²
+    unidade_exibicao: kg/m²
+    conversao: { tipo: nenhuma }
+    resolucao_espacial_graus: 0.25
+    produtos:
+      mensal: { short_name: GLDAS_NOAH025_M, versao: "2.1" }
+    periodo_esperado: { inicio: "2000-01", fim: null }
+    validado: false
+
+  - id: evapotranspiracao
+    nome: Evapotranspiração
+    definicao: Água que passa do solo e das plantas para a atmosfera (modelo GLDAS Noah).
+    categoria: terra
+    palavras_chave: [evaporação, evapotranspiração, evaporation, evapotranspiration, ET]
+    conector: data_rods
+    variavel_tecnica: Evap_tavg
+    unidade_original: kg/m²/s
+    unidade_exibicao: mm/dia
+    conversao: { tipo: fluxo_para_mm_dia }   # valor * 86400
+    resolucao_espacial_graus: 0.25
+    produtos:
+      mensal: { short_name: GLDAS_NOAH025_M, versao: "2.1" }
+    periodo_esperado: { inicio: "2000-01", fim: null }
+    validado: false
+
+  - id: precipitacao_gldas
+    nome: Precipitação (modelo GLDAS)
+    definicao: Precipitação usada pelo modelo GLDAS; alternativa à precipitação de satélite.
+    categoria: terra
+    palavras_chave: [chuva modelo, rainf, precipitation model]
+    conector: data_rods
+    variavel_tecnica: Rainf_f_tavg
+    unidade_original: kg/m²/s
+    unidade_exibicao: mm/dia
+    conversao: { tipo: fluxo_para_mm_dia }
+    resolucao_espacial_graus: 0.25
+    produtos:
+      mensal: { short_name: GLDAS_NOAH025_M, versao: "2.1" }
+    periodo_esperado: { inicio: "2000-01", fim: null }
+    validado: false
+
+  - id: aerossois
+    nome: Aerossóis (profundidade óptica a 550 nm)
+    definicao: Medida da quantidade de partículas (poeira, fumo, poluição) no ar; maior = ar mais turvo.
+    categoria: atmosfera
+    palavras_chave: [poluição, aerossóis, poeira, fumo, qualidade do ar, aerosol, AOD, pollution]
+    conector: opendap
+    variavel_tecnica: TOTEXTTAU
+    unidade_original: adimensional
+    unidade_exibicao: adimensional
+    conversao: { tipo: nenhuma }
+    resolucao_espacial_graus: 0.5
+    produtos:
+      mensal: { short_name: M2TMNXAER, versao: "5.12.4" }
+    periodo_esperado: { inicio: "1980-01", fim: null }
+    validado: false
+
+  - id: ndvi
+    nome: NDVI (índice de vegetação)
+    definicao: Mede o quão verde e saudável está a vegetação; varia de -1 a 1 (MODIS).
+    categoria: terra
+    palavras_chave: [vegetação, verde, floresta, desmatamento, NDVI, vegetation, greenness]
+    conector: appeears        # assíncrono: pré-calcular ou usar só em exemplos
+    variavel_tecnica: "CMG 0.05 Deg Monthly NDVI"   # confirmar o nome exacto da camada no AppEEARS
+    unidade_original: adimensional
+    unidade_exibicao: adimensional
+    conversao: { tipo: escala, fator: 0.0001 }
+    resolucao_espacial_graus: 0.05
+    produtos:
+      mensal: { short_name: MOD13C2, versao: "061" }
+    periodo_esperado: { inicio: "2000-02", fim: null }
+    validado: false
+    nota: Fora do MVP se o AppEEARS for demasiado lento para a demo.
