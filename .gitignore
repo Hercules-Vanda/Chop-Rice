@@ -1,0 +1,75 @@
+# ── Segredos e configuração local ───────────────────────────────
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.pem
+*.key
+.netrc
+_netrc
+
+# ── Dados descarregados da NASA e caches ────────────────────────
+*.nc
+*.nc4
+*.hdf
+*.h5
+*.he5
+*.tif
+*.tiff
+*.grib
+*.grib2
+data/raw/
+data/cache/
+.cache/
+cache/
+downloads/
+
+# ── Node / React ────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+
+# ── .NET / C# ───────────────────────────────────────────────────
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userprefs
+*.DotSettings.user
+TestResults/
+publish/
+
+# ── Python ──────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.ipynb_checkpoints/
+
+# ── Docker ──────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── Editores e sistema operativo ────────────────────────────────
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+*.log
+*.swp
