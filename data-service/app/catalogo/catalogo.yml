@@ -9,8 +9,10 @@
 # Antes de confiar neles, corre: python scripts/validar_catalogo.py
 # e altera `validado` para true só depois de uma série real ter sido obtida.
 #
+# `precalcular: true` = entra por omissão em scripts/precalcular.py (as restantes só se pedidas pelo id).
+#
 # Convenções:
-#   conector: data_rods | opendap | appeears
+#   conector: opendap | appeears   (Cloud OPeNDAP via earthaccess + pydap + xarray)
 #   conversao.tipo: nenhuma | kelvin_para_celsius | mm_h_para_mm_mes | fluxo_para_mm_dia | escala
 #   resolucoes: chaves "mensal" / "diaria"; só existe a chave se houver produto para ela.
 
@@ -19,7 +21,24 @@ versao_catalogo: 1
 variaveis:
 
   - id: precipitacao
-    nome: Precipitação
+    nome: Precipitação (reanálise MERRA-2, corrigida com observações)
+    definicao: Quantidade média diária de chuva e neve num mês. É um produto de reanálise (modelo + observações), não uma medição direta.
+    categoria: atmosfera
+    palavras_chave: [chuva, precipitação, pluviosidade, rain, rainfall, precipitation, seca]
+    conector: opendap
+    variavel_tecnica: PRECTOTCORR
+    unidade_original: kg/m²/s
+    unidade_exibicao: mm/dia
+    conversao: { tipo: fluxo_para_mm_dia }   # valor * 86400
+    resolucao_espacial_graus: 0.5   # 0.5° lat x 0.625° lon
+    produtos:
+      mensal: { short_name: M2TMNXFLX, versao: "5.12.4" }
+    periodo_esperado: { inicio: "1980-01", fim: null }
+    validado: false
+    precalcular: true
+
+  - id: precipitacao_imerg
+    nome: Precipitação (satélite GPM IMERG)
     definicao: Quantidade de chuva que cai numa região, medida por satélites (GPM IMERG).
     categoria: atmosfera
     palavras_chave: [chuva, precipitação, pluviosidade, rain, rainfall, precipitation]
@@ -34,6 +53,7 @@ variaveis:
       diaria: { short_name: GPM_3IMERGDF, versao: "07" }   # fora do MVP
     periodo_esperado: { inicio: "2000-06", fim: null }
     validado: false
+    nota: Fase 2. Produto HDF5 (group Grid) e grelha 0.1°, pesado; o precalcular.py salta-o.
 
   - id: temperatura_2m
     nome: Temperatura do ar a 2 m
@@ -50,6 +70,7 @@ variaveis:
       mensal: { short_name: M2TMNXSLV, versao: "5.12.4" }
     periodo_esperado: { inicio: "1980-01", fim: null }
     validado: false
+    precalcular: true
 
   - id: temperatura_superficie
     nome: Temperatura da superfície (skin temperature)
@@ -72,7 +93,7 @@ variaveis:
     definicao: Água contida na camada superficial do solo (modelo GLDAS Noah).
     categoria: terra
     palavras_chave: [umidade, humidade do solo, seca, drought, soil moisture, solo]
-    conector: data_rods
+    conector: opendap
     variavel_tecnica: SoilMoi0_10cm_inst
     unidade_original: kg/m²
     unidade_exibicao: kg/m²
@@ -88,7 +109,7 @@ variaveis:
     definicao: Água que passa do solo e das plantas para a atmosfera (modelo GLDAS Noah).
     categoria: terra
     palavras_chave: [evaporação, evapotranspiração, evaporation, evapotranspiration, ET]
-    conector: data_rods
+    conector: opendap
     variavel_tecnica: Evap_tavg
     unidade_original: kg/m²/s
     unidade_exibicao: mm/dia
@@ -104,7 +125,7 @@ variaveis:
     definicao: Precipitação usada pelo modelo GLDAS; alternativa à precipitação de satélite.
     categoria: terra
     palavras_chave: [chuva modelo, rainf, precipitation model]
-    conector: data_rods
+    conector: opendap
     variavel_tecnica: Rainf_f_tavg
     unidade_original: kg/m²/s
     unidade_exibicao: mm/dia
@@ -130,6 +151,7 @@ variaveis:
       mensal: { short_name: M2TMNXAER, versao: "5.12.4" }
     periodo_esperado: { inicio: "1980-01", fim: null }
     validado: false
+    precalcular: true
 
   - id: ndvi
     nome: NDVI (índice de vegetação)
