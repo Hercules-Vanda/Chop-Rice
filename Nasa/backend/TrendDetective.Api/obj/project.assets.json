@@ -83,24 +83,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\hendr\\.nuget\\packages\\": {}
+    "/home/herculesv/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\hendr\\OneDrive\\Desktop\\Programas\\Projects\\Chop-Rice\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
+      "projectUniqueName": "/home/herculesv/Documents/Chop-Rice/Nasa/backend/TrendDetective.Api/TrendDetective.Api.csproj",
       "projectName": "TrendDetective.Api",
-      "projectPath": "C:\\Users\\hendr\\OneDrive\\Desktop\\Programas\\Projects\\Chop-Rice\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
-      "packagesPath": "C:\\Users\\hendr\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\hendr\\OneDrive\\Desktop\\Programas\\Projects\\Chop-Rice\\Nasa\\backend\\TrendDetective.Api\\obj\\",
+      "projectPath": "/home/herculesv/Documents/Chop-Rice/Nasa/backend/TrendDetective.Api/TrendDetective.Api.csproj",
+      "packagesPath": "/home/herculesv/.nuget/packages/",
+      "outputPath": "/home/herculesv/Documents/Chop-Rice/Nasa/backend/TrendDetective.Api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\hendr\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/home/herculesv/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net11.0"
       ],
       "sources": {
+        "/usr/lib/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -151,7 +152,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\11.0.100/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/11.0.100/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,11.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,11.0.32767]",

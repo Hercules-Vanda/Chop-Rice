@@ -44,7 +44,7 @@ var app = builder.Build();
 
 // Ativa as políticas de CORS e redirecionamento HTTPS
 app.UseCors("AllowReactApp");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 // ==========================================
 // 2. DEFINIÇÃO DE ENDPOINTS PÚBLICOS

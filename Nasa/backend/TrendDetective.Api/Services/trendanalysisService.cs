@@ -43,7 +43,7 @@ public class TrendAnalysisService : ITrendAnalysisService
     {
         try
         {
-            var response = await _pythonClient.PostAsJsonAsync("internal/analisar", request, _jsonOptions);
+            var response = await _pythonClient.PostAsJsonAsync("http://127.0.0.1:8000", request, _jsonOptions);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
