@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "RLEu/tz4yCk=",
+  "success": true,
+  "projectFilePath": "C:\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\MISTÉRIO SOARES\\.nuget\\packages\\microsoft.aspnetcore.openapi\\11.0.0\\microsoft.aspnetcore.openapi.11.0.0.nupkg.sha512",
+    "C:\\Users\\MISTÉRIO SOARES\\.nuget\\packages\\microsoft.openapi\\3.11.0\\microsoft.openapi.3.11.0.nupkg.sha512"
+  ],
+  "logs": []
+}
