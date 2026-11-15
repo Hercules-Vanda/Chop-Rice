@@ -18,7 +18,7 @@ Uma única tela. O utilizador escolhe filtros (região, resolução, variável, 
                                                                            └────────────┬─────────────┘
                                                                                         │ HTTPS
                                                           ┌─────────────────────────────┴───────────────┐
-                                                          │ CMR (descoberta) · Data Rods / OPeNDAP /    │
+                                                          │ CMR (descoberta) · Cloud OPeNDAP /    │
                                                           │ Harmony / AppEEARS (valores)                │
                                                           └─────────────────────────────────────────────┘
 ```
@@ -99,7 +99,7 @@ Regras:
       "declive": -0.08,
       "unidade_declive": "mm/mês por ano",
       "ic95": [-0.14, -0.02],
-      "metodo": "mann_kendall + sen_slope",
+      "metodo": "Mann-Kendall + declive de Sen (medias anuais)",
       "estatistica": -2.41,
       "p_valor": 0.016,
       "significativo": true,
@@ -261,12 +261,12 @@ temperatura_2m:
 umidade_solo:
   nome: Umidade do solo (0–10 cm)
   produto: GLDAS_NOAH025_M_v2.1        # variável SoilMoi0_10cm_inst
-  conector: data_rods
+  conector: opendap
   resolucoes: [mensal]
 evapotranspiracao:
   nome: Evapotranspiração
   produto: GLDAS_NOAH025_M_v2.1        # variável Evap_tavg
-  conector: data_rods
+  conector: opendap
   resolucoes: [mensal]
 ndvi:
   nome: Índice de vegetação (NDVI)
@@ -288,17 +288,21 @@ class Conector(Protocol):
         ...
 ```
 
-Implementações (por ordem de prioridade): `DataRodsConector`, `OpendapConector`, `AppeearsConector`. Ver secção 6.
+Implementações (por ordem de prioridade): `OpendapConector`, `OpendapConector`, `AppeearsConector`. Ver secção 6.
 
-### 4.4 Estatística
+### 4.4 Estatística (código, sem LLM — `dados.calcular_tendencia`, chamada dentro de `consultar`)
 
-1. Agregar/limpar: remover `fill values`, ordenar, detectar buracos.
-2. **Remover o ciclo sazonal** (o próprio desafio diz que, sem isso, muitas tendências não aparecem): usar anomalias mensais (valor − climatologia do mês).
-3. **Mann-Kendall** (`pymannkendall.original_test` ou `seasonal_test`) → `p_valor`, `direcao`.
-4. **Sen's slope** → `declive` robusto + `ic95`.
-5. Converter o declive para unidade legível (por ano/década).
-6. Bloquear se `n < 30` (erro `SERIE_CURTA`) ou avisar se há muitos buracos.
-7. Atenção: a autocorrelação serial infla a significância; usar `hamed_rao_modification_test` como alternativa.
+**Método único.** Não há uma tool por método: escolher o teste é uma decisão analítica fixa em código.
+
+1. Usar só **anos completos** (12 meses). A média anual já remove o ciclo sazonal.
+2. **Mann-Kendall** sobre as médias anuais → `p_valor`, `estatistica` (Z) e `direcao`.
+3. **Declive de Sen** por ano (+ **IC95**) sobre as mesmas médias anuais (mesma série ⇒ `p_valor` e `ic95` coerentes).
+4. `direcao` = `crescente`/`decrescente` **só se significativo** (alfa = `NIVEL_SIGNIFICANCIA`); caso contrário `sem_tendencia` (o `declive` continua a ser devolvido, com IC que inclui o zero).
+5. `linha_tendencia`: 2 pontos (primeiro e último mês) da reta de Sen.
+6. **Menos de `MIN_ANOS_TENDENCIA` (10) anos completos** → `trends` vazio, `dados[].declive = null` e um aviso. Não é erro.
+7. Avisos automáticos: autocorrelação mensal alta (lag-1 ≥ 0,5) e "não significativo ≠ sem tendência".
+
+**Porque médias anuais (simulação própria, 300 séries mensais sazonais, ruído AR(1) φ = 0,6, sem tendência real):** o Mann-Kendall sazonal, o MK em anomalias mensais e o OLS declararam tendência em ~30–36 % dos casos (nominal: 5 %); o Hamed-Rao, ~16–18 %; o pré-branqueamento (TFPW), ~42 %; o MK em médias anuais, ~5 %. O custo é o poder (≈28 % para 0,03/ano com 25 anos). O teste ADF (artigo de referência) **não** é teste de tendência (testa raiz unitária) e foi excluído. A autocorrelação (φ) é um pressuposto da simulação: confirmar com as séries reais.
 
 ### 4.5 Segurança e custos do agente
 
@@ -307,6 +311,29 @@ Implementações (por ordem de prioridade): `DataRodsConector`, `OpendapConector
 - Timeouts de 30–45 s no total; cache por `(variavel, lat, lon, resolucao, periodo)` (arredondar lat/lon a ~0,25°).
 
 ---
+
+### 4.6 Dados pré-calculados (decisão: a NASA é lenta de mais para pedidos ao vivo)
+
+Ler 25 anos de um ponto via Cloud OPeNDAP demora ~12 min (≈2,4 s por granulo mensal), muito acima de um pedido interativo. Por isso as séries são **geradas offline** por `scripts/precalcular.py` e guardadas no repositório:
+
+```
+data-service/app/dados/
+├── indice.json                  # locais, variáveis, unidades, produto/versão, célula de grelha usada
+└── <variavel>/<local>.csv       # colunas: t, valor (já na unidade de exibição)
+```
+
+Consequências para o contrato:
+
+- O agente escolhe **variável + local entre os pré-calculados**. Se o utilizador der coordenadas, usa-se o **local pré-calculado mais próximo** e devolve-se a distância; acima de um limite (ex.: 300 km) → erro `SEM_DADOS` com sugestões.
+- `interpretacao` ganha o campo `local_usado`: `{ "id": "luanda", "nome": "Luanda, Angola", "distancia_km": 0.0 }`.
+- Novo endpoint **`GET /api/locais`** (lista de locais disponíveis, de `indice.json`) para o front oferecer um seletor/mapa com marcadores em vez de clique livre.
+- `periodo` passa a poder ser **cortado** (a série guardada é sempre 2000–2024; o filtro só restringe a janela).
+- Estatística (Mann-Kendall, Sen) **continua a ser calculada no pedido**, a partir do CSV (milissegundos).
+- `ANALISE_TIMEOUT_SECONDS` pode baixar para ~15 s (o gargalo passa a ser só o LLM).
+- Para atualizar os dados: `uv run scripts/precalcular.py --forcar` e fazer commit dos CSV.
+- `dados[].declive` é `null` (e `trends` vem vazio) quando a série tem menos de 10 anos completos.
+
+> Mudança de contrato (`/api/locais`, `interpretacao.local_usado`): **avisar Ruben e Hendry antes de implementar.**
 
 ## 5. Front React (Hendry, com Justo)
 
@@ -333,8 +360,7 @@ Ver secção "Fontes de dados" abaixo e o resumo na conversa. Requisitos comuns:
 | Fonte | Para quê | Como acedemos | Notas |
 |---|---|---|---|
 | **CMR** (`cmr.earthdata.nasa.gov/search`) | Descobrir colecções/variáveis/cobertura. **Não devolve valores.** | REST (`/collections.json`, `/variables.json`) | Usar só para catálogo e metadados |
-| **Hydrology Time Series / Data Rods (GES DISC)** | Série temporal de um **ponto** (GLDAS, NLDAS, etc.) | HTTP GET com `variable`, `location`, `startDate`, `endDate` → texto/CSV | Mais simples para o MVP; confirmar quais produtos estão activos |
-| **OPeNDAP / earthaccess** | Séries de qualquer produto com subsetting por ponto/região | `earthaccess` (Python) ou OPeNDAP + `xarray` | Mais geral; requer mais código |
+| **Cloud OPeNDAP (earthaccess + pydap + xarray)** | Série temporal de um ponto, sem descarregar ficheiros inteiros | `earthaccess.search_data` → URLs OPeNDAP com `?dap4.ce=/VAR;/lat;/lon;/time` → `xarray.open_mfdataset(engine="pydap")` | Base: notebook oficial do GES DISC. Requer as apps "NASA GES DISC DATA ARCHIVE" e "Hyrax in the Cloud" ativas no Earthdata. Data Rods (descontinuado) e a API de séries do Giovanni (500) foram descartados |
 | **AppEEARS** | MODIS/VIIRS (NDVI, temperatura da superfície) | REST **assíncrono** (submeter tarefa → esperar → descarregar) | Lento: usar só se for imprescindível ou pré-calculado |
 | **Giovanni** | Visualização/validação manual | Interface web | Usar para **comparar** os teus resultados; não é uma API estável |
 
