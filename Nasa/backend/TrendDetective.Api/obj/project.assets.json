@@ -83,19 +83,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\MISTÉRIO SOARES\\.nuget\\packages\\": {}
+    "C:\\Users\\hendr\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
+      "projectUniqueName": "C:\\Users\\hendr\\OneDrive\\Desktop\\Programas\\Projects\\Chop-Rice\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
       "projectName": "TrendDetective.Api",
-      "projectPath": "C:\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
-      "packagesPath": "C:\\Users\\MISTÉRIO SOARES\\.nuget\\packages\\",
-      "outputPath": "C:\\Nasa\\backend\\TrendDetective.Api\\obj\\",
+      "projectPath": "C:\\Users\\hendr\\OneDrive\\Desktop\\Programas\\Projects\\Chop-Rice\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
+      "packagesPath": "C:\\Users\\hendr\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\hendr\\OneDrive\\Desktop\\Programas\\Projects\\Chop-Rice\\Nasa\\backend\\TrendDetective.Api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\MISTÉRIO SOARES\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\hendr\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net11.0"

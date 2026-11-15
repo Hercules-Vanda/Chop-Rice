@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "RLEu/tz4yCk=",
+  "dgSpecHash": "coN5QRXZPxM=",
   "success": true,
-  "projectFilePath": "C:\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
+  "projectFilePath": "C:\\Users\\hendr\\OneDrive\\Desktop\\Programas\\Projects\\Chop-Rice\\Nasa\\backend\\TrendDetective.Api\\TrendDetective.Api.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\MISTÉRIO SOARES\\.nuget\\packages\\microsoft.aspnetcore.openapi\\11.0.0\\microsoft.aspnetcore.openapi.11.0.0.nupkg.sha512",
-    "C:\\Users\\MISTÉRIO SOARES\\.nuget\\packages\\microsoft.openapi\\3.11.0\\microsoft.openapi.3.11.0.nupkg.sha512"
+    "C:\\Users\\hendr\\.nuget\\packages\\microsoft.aspnetcore.openapi\\11.0.0\\microsoft.aspnetcore.openapi.11.0.0.nupkg.sha512",
+    "C:\\Users\\hendr\\.nuget\\packages\\microsoft.openapi\\3.11.0\\microsoft.openapi.3.11.0.nupkg.sha512"
   ],
   "logs": []
 }
